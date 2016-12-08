@@ -1,6 +1,6 @@
 ---
 title: Testing Effects of Transport Media Reagents
-output: github_document
+output: html_document
 ---
 
 ```{r read in 7Dec16 data, echo = FALSE, message = FALSE , warning = FALSE}
