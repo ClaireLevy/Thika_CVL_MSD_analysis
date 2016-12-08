@@ -33,6 +33,12 @@ dat7Dec16$Assay <-recode(dat7Dec16$Assay,
                                       "IL-1Î²" = "IL-1\U03B2",
                                       "IFN-Î³" = "IFNg")
 
+
+forJosh<-dat7Dec16 %>%
+  filter(Sample.Group == "Standards"|str_detect(Sample, "P|pool"))%>%
+  mutate(Dilution = ifelse(str_detect(Sample, "1:10"),"1:10","neat"))%>%
+  write.csv(file = "raw_data_for_Josh.csv")
+
 ```
 
 ## Checking Standard Recovery and Curves
