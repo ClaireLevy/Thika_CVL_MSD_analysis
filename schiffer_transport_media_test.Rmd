@@ -1,0 +1,184 @@
+---
+title: Testing Effects of Transport Media Reagents
+output: github_document
+---
+
+```{r read in 7Dec16 data, echo = FALSE, message = FALSE , warning = FALSE}
+
+
+library(dplyr)
+library(ggplot2)
+library(pander)
+library(reshape2)
+library(stringr)
+library(swarm)
+
+
+#We ran some samples for Josh Schiffer's group on this MSD run so I'll analyze first.
+
+
+dat7Dec16 <- read.csv("../Sample Runs/7Dec16 9plex_8plex/raw data from DiscoveryWorkbench/7Dec16 8plex_9plex.csv", skip = 1)
+
+
+
+#Fix the greek
+
+dat7Dec16$Assay <-recode(dat7Dec16$Assay,
+                                      "IFN-Î±2a" = paste("IFN-\U03B1","2a", sep = ""),
+                                      "IL-1Î±" = "IL-1\U03B1",
+                                      "MIP-1Î±"="MIP-1\U03B1",
+                                      "TNF-Î±" = "TNF-\U03B1",
+                                      "MIP-3Î±" = "MIP-3\U03B1",
+                                      "MIP-1Î²" = "MIP-1\U03B2",
+                                      "IL-1Î²" = "IL-1\U03B2",
+                                      "IFN-Î³" = "IFNg")
+
+```
+
+## Checking Standard Recovery and Curves
+
+
+Here are plots of the % recovery (extrapolated concentration/ known concentration x 100) for the standards that were either within or above the detection range, with lines at the "good recovery" limits of 80 and 120% recovery.
+
+The R^2^ values for goodness-of-fit for the standard curves were all >0.99
+
+```{r standards,echo=FALSE, message = FALSE, warning = FALSE}
+
+
+stnds_dat7Dec16<-filter(dat7Dec16, Sample.Group == "Standards")
+
+
+
+#which standards are out of det. range?
+standardsOutOfRange<-stnds_dat7Dec16 %>%
+  filter(Detection.Range != "In Detection Range")%>%
+  select(Plate.Name,Sample, Assay, Detection.Range, X..Recovery, Calc..Concentration)
+
+
+
+#looking at which samples have STDs below the fit curve or below the detection range (i.e. you can't get numbers for % recovery) 
+
+stnds_below_dat7Dec16<- stnds_dat7Dec16%>%
+  filter(Detection.Range == "Below Fit Curve Range" | Detection.Range == "Below Detection Range") %>%
+  group_by(Sample)%>%
+  summarise("Number of Samples Below Fit Curve Range/Detection Range" = n())
+
+
+whichAssay_stnds_below_dat7Dec16<-stnds_dat7Dec16 %>%
+   filter(Detection.Range == "Below Fit Curve Range" | Detection.Range == "Below Detection Range") %>%
+  filter(!str_detect(Sample, "008"))%>%
+  select(Sample, Assay, Detection.Range)
+```
+
+
+```{r percent recovery, fig.height = 7, fig.width = 12,echo=FALSE, message = FALSE, warning = FALSE}
+#The samples that actually give me #'s for percent recovery ( i.e. all but the "below fit curve range" and "below detection range" ones)
+
+stnds_percent_recov_dat7Dec16<- stnds_dat7Dec16 %>% 
+  arrange(Sample,Assay)%>%
+  filter(Detection.Range != "Below Fit Curve Range" & Detection.Range!= "Below Detection Range")%>%
+  select(Plate.Name,Sample, Assay,Detection.Range, X..Recovery,Fit.Statistic..RSquared, Concentration, Calc..Concentration)
+
+
+#plotting percent recovery with lines showing the bounds of "good recovery" (btwn 80 and 120%)
+
+ggplot(stnds_percent_recov_dat7Dec16,aes( x = Sample, y = X..Recovery)) +
+  geom_point(aes(shape = Detection.Range ),
+             size = 2, alpha = 0.5)+
+  scale_shape_manual(values = c("Above Fit Curve Range" = 1, 
+                                "In Detection Range" = 16, 
+                                "Below Detection Range" = 0))+
+  facet_wrap(~Assay)+
+  theme(axis.text.x = element_text(angle=25))+
+  scale_y_continuous(limits = c(0, 180))+
+  geom_abline(slope = 0, intercept = c(80, 120))+
+  labs(y = "Percent Recovery")+
+  theme(axis.text.x = element_text(size = 9))+
+  ggtitle("Percent Recovery of Standards")
+```
+
+
+
+```{r rsquared,echo=FALSE, message = FALSE, warning = FALSE}
+
+#checking the R squared goodness-of-fit for the standard curves
+rSquared<-stnds_percent_recov_dat7Dec16%>%
+  group_by(Assay)%>%
+  summarize(R_Squared = mean(Fit.Statistic..RSquared))
+```
+
+## Caveats about Standards
+
+* Standards with values *below the detection range* (<2.5x the standard deviation of the lowest standard) give unreliable concentrations, so I did not include those in the plots.
+
+* When standards are *below the curve fit* (outside the range of the standard curve), the software does not calculate concentrations so you can't get a percent recovery.
+
+* Most of the Standards that fell into either of these categories were from the least concentrated standard (diluent only) except for two from Standard 6 and five from standard 7:
+
+`r pander(stnds_below_dat7Dec16)`
+
+`r pander(whichAssay_stnds_below_dat7Dec16)`
+
+```{r Josh samples and controls,echo=FALSE, message = FALSE, warning = FALSE}
+
+#make a column for Dilution and a column for sample type
+
+CVLpool<-dat7Dec16 %>%
+filter(str_detect(Sample, "P|pool"))%>%
+mutate(Dilution = ifelse(
+str_detect(Sample, "1:10"), "1:10", "neat"))%>%
+mutate(Type = ifelse(
+str_detect(Sample, "Cocktail"), "Test","Control"))
+```
+
+
+## Testing effects of transport media cocktail
+
+We added the following reagents to our usual control CVL pool to mimic the transport medium:
+
+* Protease Inhibitor at a 1x final concentration (Calbiochem, lot 2746008, catalog #: 539131-1VL)
+
+* 10% Igepal (Sigma, lot 51K0084, catalog #: 1-3021)
+
+* 0.25% BSA (Sigma, lot 018K699, cat # A9647-500G)
+
+We tested both a "neat" and 1:10 dilution of the samples. All samples were run in duplicate.
+
+```{r below detection,echo=FALSE, message = FALSE, warning = FALSE}
+
+CVLpoolDetect<-CVLpool %>%
+filter(!Detection.Range == "In Detection Range")%>%
+select(Assay, Dilution,Type, Detection.Range)%>%
+group_by(Assay,Type,Dilution, Detection.Range)%>%
+summarise("Number In Range" = n())
+
+names(CVLpoolDetect)[4]<- "Detection Range"
+
+```
+  
+#Results
+
+For some cytokines, some of the sample concentrations fell below the detection range:
+
+`r pander(CVLpoolDetect)`
+
+
+There was a wide range of concentrations across cytokines but the test and control samples were similar:
+
+```{r all concentrations,echo=FALSE, message = FALSE, warning = FALSE}
+
+
+inRangeCVLpool<-CVLpool %>%
+filter(Detection.Range == "In Detection Range")
+
+
+ggplot(inRangeCVLpool, aes(x = Dilution, y = Calc..Concentration))+
+geom_point(aes(color = Type))+
+labs(y = "Cytokine Concentration (pg/ml)")+
+facet_wrap(~Assay, scales = "free_y")+
+ggtitle("Cytokine Concentrations (note scales)")
+
+```
+
+
+  
