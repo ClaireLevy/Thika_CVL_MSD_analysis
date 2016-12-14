@@ -1,7 +1,12 @@
 ---
 title: Testing Effects of Transport Media Reagents
-output: github_document
+output: html_document
 ---
+## Cytokines measured
+
+IFN-α2a, IL-17A, IL-18, IL-1α, IL-7, IP-10   
+MIP-1α, MIP-1β, MIP-3α, IFNg, IL-10, IL-12p70
+IL-1β, IL-2, IL-6, IL-8, TNF-α   
 
 ```{r read in 7Dec16 data, echo = FALSE, message = FALSE , warning = FALSE}
 
@@ -156,9 +161,17 @@ CVLpoolDetect<-CVLpool %>%
 filter(!Detection.Range == "In Detection Range")%>%
 select(Assay, Dilution,Type, Detection.Range)%>%
 group_by(Assay,Type,Dilution, Detection.Range)%>%
-summarise("Number In Range" = n())
+summarise("Samples" = n())
 
 names(CVLpoolDetect)[4]<- "Detection Range"
+
+
+
+missingDiluted <- CVLpoolDetect %>%
+  filter(Dilution == "1:10", Samples == 2)
+
+missingNeat<-CVLpoolDetect %>%
+  filter(Dilution == "neat", Samples == 2)
 
 ```
   
@@ -169,7 +182,13 @@ For some cytokines, some of the sample concentrations fell below the detection r
 `r pander(CVLpoolDetect)`
 
 
-There was a wide range of concentrations across cytokines but the test and control samples were similar:
+There was a wide range of concentrations across cytokines but the test and control samples were similar. Below are plots showing the calculated concentrations for the *1:10 diluted* and *neat* samples. 
+
+Note that the concentrations are plotted on a *log 10* scale.
+
+Some conditions are missing dots: these are ones where the concentration was below the level of detection.
+
+
 
 ```{r all concentrations,echo=FALSE, message = FALSE, warning = FALSE}
 
@@ -177,13 +196,28 @@ There was a wide range of concentrations across cytokines but the test and contr
 inRangeCVLpool<-CVLpool %>%
 filter(Detection.Range == "In Detection Range")
 
+#diluted samples
+diluted<-inRangeCVLpool %>%
+  filter(Dilution == "1:10")
 
-ggplot(inRangeCVLpool, aes(x = Dilution, y = Calc..Concentration))+
-geom_point(aes(color = Type))+
-labs(y = "Cytokine Concentration (pg/ml)")+
-facet_wrap(~Assay, scales = "free_y")+
-ggtitle("Cytokine Concentrations (note scales)")
+ggplot(diluted, aes(x = Type, y = log10(Calc..Concentration)))+
+geom_jitter(aes(), width = 0.25)+
+labs(y = "log10 Cytokine Concentration (pg/ml)")+
+facet_wrap(~Assay)+
+ggtitle("log10 Cytokine Concentrations of *1:10 diluted* samples")
 
+
+
+#neat samples 
+
+neat<-inRangeCVLpool %>%
+  filter(Dilution != "1:10")
+
+ggplot(neat, aes(x = Type, y = log10(Calc..Concentration)))+
+geom_jitter(aes(), width = 0.25)+
+labs(y = "log 10 Cytokine Concentration (pg/ml)")+
+facet_wrap(~Assay)+
+ggtitle("log 10 Cytokine Concentrations of *neat* samples")
 ```
 
 

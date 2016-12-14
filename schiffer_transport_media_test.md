@@ -1,6 +1,12 @@
 Testing Effects of Transport Media Reagents
 ================
 
+Cytokines measured
+------------------
+
+IFN-α2a, IL-17A, IL-18, IL-1α, IL-7, IP-10
+MIP-1α, MIP-1β, MIP-3α, IFNg, IL-10, IL-12p70 IL-1β, IL-2, IL-6, IL-8, TNF-α
+
 Checking Standard Recovery and Curves
 -------------------------------------
 
@@ -116,13 +122,13 @@ Results
 
 For some cytokines, some of the sample concentrations fell below the detection range:
 
-<table style="width:93%;">
+<table style="width:82%;">
 <colgroup>
 <col width="12%" />
 <col width="11%" />
 <col width="15%" />
 <col width="30%" />
-<col width="23%" />
+<col width="12%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -130,7 +136,7 @@ For some cytokines, some of the sample concentrations fell below the detection r
 <th align="center">Type</th>
 <th align="center">Dilution</th>
 <th align="center">Detection Range</th>
-<th align="center">Number In Range</th>
+<th align="center">Samples</th>
 </tr>
 </thead>
 <tbody>
@@ -284,6 +290,10 @@ For some cytokines, some of the sample concentrations fell below the detection r
 </tbody>
 </table>
 
-There was a wide range of concentrations across cytokines but the test and control samples were similar:
+There was a wide range of concentrations across cytokines but the test and control samples were similar. Below are plots showing the calculated concentrations for the *1:10 diluted* and *neat* samples.
 
-![](schiffer_transport_media_test_files/figure-markdown_github/all%20concentrations-1.png)
+Note that the concentrations are plotted on a *log 10* scale.
+
+Some conditions are missing dots: these are ones where the concentration was below the level of detection.
+
+![](schiffer_transport_media_test_files/figure-markdown_github/all%20concentrations-1.png)![](schiffer_transport_media_test_files/figure-markdown_github/all%20concentrations-2.png)
