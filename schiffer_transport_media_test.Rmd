@@ -1,6 +1,6 @@
 ---
 title: Testing Effects of Transport Media Reagents
-output: html_document
+output: github_document
 ---
 ## Cytokines measured
 
@@ -39,10 +39,10 @@ dat7Dec16$Assay <-recode(dat7Dec16$Assay,
                                       "IFN-Î³" = "IFNg")
 
 
-forJosh<-dat7Dec16 %>%
-  filter(Sample.Group == "Standards"|str_detect(Sample, "P|pool"))%>%
-  mutate(Dilution = ifelse(str_detect(Sample, "1:10"),"1:10","neat"))%>%
-  write.csv(file = "raw_data_for_Josh.csv")
+# forJosh<-dat7Dec16 %>%
+#   filter(Sample.Group == "Standards"|str_detect(Sample, "P|pool"))%>%
+#   mutate(Dilution = ifelse(str_detect(Sample, "1:10"),"1:10","neat"))%>%
+#   write.csv(file = "raw_data_for_Josh.csv")
 
 ```
 
@@ -163,7 +163,6 @@ select(Assay, Dilution,Type, Detection.Range)%>%
 group_by(Assay,Type,Dilution, Detection.Range)%>%
 summarise("Samples" = n())
 
-names(CVLpoolDetect)[4]<- "Detection Range"
 
 
 
@@ -190,7 +189,7 @@ Some conditions are missing dots: these are ones where the concentration was bel
 
 
 
-```{r all concentrations,echo=FALSE, message = FALSE, warning = FALSE}
+```{r  plot diluted,echo=FALSE, message = FALSE, warning = FALSE}
 
 
 inRangeCVLpool<-CVLpool %>%
@@ -201,24 +200,69 @@ diluted<-inRangeCVLpool %>%
   filter(Dilution == "1:10")
 
 ggplot(diluted, aes(x = Type, y = log10(Calc..Concentration)))+
-geom_jitter(aes(), width = 0.25)+
+geom_jitter(aes(), width = 0.25, alpha = 0.5, size = 3)+
 labs(y = "log10 Cytokine Concentration (pg/ml)")+
 facet_wrap(~Assay)+
 ggtitle("log10 Cytokine Concentrations of *1:10 diluted* samples")
+```
 
-
-
+```{r  plot neat,echo=FALSE, message = FALSE, warning = FALSE}
 #neat samples 
 
 neat<-inRangeCVLpool %>%
   filter(Dilution != "1:10")
 
 ggplot(neat, aes(x = Type, y = log10(Calc..Concentration)))+
-geom_jitter(aes(), width = 0.25)+
-labs(y = "log 10 Cytokine Concentration (pg/ml)")+
+geom_jitter(aes(), width = 0.25, alpha = 0.5, size = 3)+
+labs(y = "log10 Cytokine Concentration (pg/ml)")+
 facet_wrap(~Assay)+
-ggtitle("log 10 Cytokine Concentrations of *neat* samples")
+ggtitle("log10 Cytokine Concentrations of *neat* samples")
 ```
 
 
-  
+
+```{r plotting standards and samples setup,echo=FALSE, message = FALSE, warning = FALSE}
+
+#appendix C of discovery workbench user guide shows which parameters I need for the FourPL regression that was used for drawing the standard curve.
+
+#y = b1 + (b2-b1)/(1+(x/b3)^b4)
+# Where:
+# y=ECL counts (response)
+# x=Concentration (known calibrator concentration)
+# b1=Maximum response plateau (Calc. Top)
+# b2=Minimum response plateau (Calc. Bottom)
+# b3=Concentration at which 50% of the maximal response is observed (Calc. MidPoint)
+# b4="Slope" or shape parameter (Calc. HillSlope)
+
+plotStandards<-dat7Dec16 %>%
+  filter(Sample.Group == "Standards") %>% 
+  select(Sample,Assay,Signal,Concentration,Algorithm.Parameter..Calc..Top,Algorithm.Parameter..Calc..Bottom,Algorithm.Parameter..Calc..MidPoint,Algorithm.Parameter..Calc..HillSlope)
+
+#make better names
+names(plotStandards)<-c("Sample","Assay","Signal","Concentration","CalcTop","CalcBottom","CalcMid","CalcHillslope")
+
+#remove std 8 (discovery workbench doesn't include it and I"m trying to match my plots to them except less ugly geez.)
+plotStandardsNoS008<-plotStandards %>% 
+  filter(Sample != "S008")
+```
+
+```{r plotting standards and samples,echo=FALSE, message = FALSE, warning = FALSE, fig.height= 10, fig.width = 10}
+#plotting the curves for the standards using the FourPL equation provided by Discovery Workbench with the samples overlaid on the curve.
+
+#There are 6 rows containing missing values: these are the values that were "Below Fit Curve Range" so DWB only gives me "NaN" for the caluclated concentration.
+
+#There are other samples that were "Below Detection Range", but I still get values for those, just not reliable ones.
+
+
+ggplot(plotStandardsNoS008,aes(x = log10(Concentration), y =
+log10(CalcTop + ((CalcBottom - CalcTop)/(1+ (Concentration/CalcMid)^CalcHillslope)))))+
+  geom_line(aes(group = Assay),size = .2, alpha = 0.5, linetype = "dashed")+
+  geom_point(data = CVLpool, aes(x = log10(Calc..Concentration), y = log10(Signal), group = Assay, color = Type, shape = Dilution),size = 3, alpha = 0.5)+
+  scale_shape_manual(values = c("neat"= 16,"1:10" = 1 ))+
+  facet_wrap(~Assay)+
+  xlim(c(-2.5, 5.5))+
+  labs(y = "log10 (Signal)")+
+  ggtitle("Standard Curves and Samples")+
+  theme(strip.text = element_text(size =12))
+```  
+ 

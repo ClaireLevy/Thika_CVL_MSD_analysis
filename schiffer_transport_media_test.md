@@ -135,7 +135,7 @@ For some cytokines, some of the sample concentrations fell below the detection r
 <th align="center">Assay</th>
 <th align="center">Type</th>
 <th align="center">Dilution</th>
-<th align="center">Detection Range</th>
+<th align="center">Detection.Range</th>
 <th align="center">Samples</th>
 </tr>
 </thead>
@@ -296,4 +296,8 @@ Note that the concentrations are plotted on a *log 10* scale.
 
 Some conditions are missing dots: these are ones where the concentration was below the level of detection.
 
-![](schiffer_transport_media_test_files/figure-markdown_github/all%20concentrations-1.png)![](schiffer_transport_media_test_files/figure-markdown_github/all%20concentrations-2.png)
+![](schiffer_transport_media_test_files/figure-markdown_github/plot%20diluted-1.png)
+
+![](schiffer_transport_media_test_files/figure-markdown_github/plot%20neat-1.png)
+
+![](schiffer_transport_media_test_files/figure-markdown_github/plotting%20standards%20and%20samples-1.png)
