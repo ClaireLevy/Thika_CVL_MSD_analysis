@@ -67,39 +67,39 @@ Caveats about Standards
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">S006</td>
-<td align="center">MIP-1a</td>
-<td align="center">Below Fit Curve Range</td>
-</tr>
-<tr class="even">
-<td align="center">S006</td>
-<td align="center">MIP-1a</td>
-<td align="center">Below Detection Range</td>
-</tr>
-<tr class="odd">
-<td align="center">S007</td>
-<td align="center">MIP-1a</td>
-<td align="center">Below Detection Range</td>
-</tr>
-<tr class="even">
-<td align="center">S007</td>
-<td align="center">MIP-1a</td>
-<td align="center">Below Fit Curve Range</td>
-</tr>
-<tr class="odd">
-<td align="center">S007</td>
-<td align="center">MIP-1ß</td>
-<td align="center">Below Detection Range</td>
-</tr>
-<tr class="even">
-<td align="center">S007</td>
-<td align="center">MIP-1ß</td>
-<td align="center">Below Fit Curve Range</td>
-</tr>
-<tr class="odd">
 <td align="center">S007</td>
 <td align="center">IL-2</td>
 <td align="center">Below Detection Range</td>
+</tr>
+<tr class="even">
+<td align="center">S006</td>
+<td align="center">MIP-1a</td>
+<td align="center">Below Fit Curve Range</td>
+</tr>
+<tr class="odd">
+<td align="center">S006</td>
+<td align="center">MIP-1a</td>
+<td align="center">Below Detection Range</td>
+</tr>
+<tr class="even">
+<td align="center">S007</td>
+<td align="center">MIP-1a</td>
+<td align="center">Below Detection Range</td>
+</tr>
+<tr class="odd">
+<td align="center">S007</td>
+<td align="center">MIP-1a</td>
+<td align="center">Below Fit Curve Range</td>
+</tr>
+<tr class="even">
+<td align="center">S007</td>
+<td align="center">MIP-1ß</td>
+<td align="center">Below Detection Range</td>
+</tr>
+<tr class="odd">
+<td align="center">S007</td>
+<td align="center">MIP-1ß</td>
+<td align="center">Below Fit Curve Range</td>
 </tr>
 </tbody>
 </table>
@@ -166,7 +166,7 @@ For some cytokines, some of the sample concentrations fell below the detection r
 <td align="center">Test</td>
 <td align="center">1:10</td>
 <td align="center">Below Detection Range</td>
-<td align="center">1</td>
+<td align="center">2</td>
 </tr>
 <tr class="odd">
 <td align="center">IL-10</td>

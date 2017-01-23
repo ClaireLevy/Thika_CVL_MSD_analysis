@@ -16,13 +16,13 @@ library(ggplot2)
 library(pander)
 library(reshape2)
 library(stringr)
-library(swarm)
+
 
 
 #We ran some samples for Josh Schiffer's group on this MSD run so I'll analyze first.
 
 
-dat7Dec16 <- read.csv("../Sample Runs/7Dec16 9plex_8plex/raw data from DiscoveryWorkbench/7Dec16 8plex_9plex.csv", skip = 1)
+dat7Dec16 <- read.csv("../Sample Runs/7Dec16 9plex_8plex/raw data from DiscoveryWorkbench/7Dec16_8plex_9plex.csv", skip = 1)
 
 
 
@@ -264,5 +264,14 @@ log10(CalcTop + ((CalcBottom - CalcTop)/(1+ (Concentration/CalcMid)^CalcHillslop
   labs(y = "log10 (Signal)")+
   ggtitle("Standard Curves and Samples")+
   theme(strip.text = element_text(size =12))
+
+
+#note that I'm just plotting the data here, not actually doing the extrapolation from the standard curve to get calculated concentrations of the samples. IF I were to do that, I should include the fact that the MSD software uses weighting, as described by a rep in an email to me: "One other thing to keep in mind, we use the 4PL with 1/y2 weighting. Without that with your independent software you may see some differences in the calculated concentration number. "
+
+
+
+
+
+
 ```  
  
