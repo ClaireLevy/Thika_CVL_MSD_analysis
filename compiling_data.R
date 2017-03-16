@@ -311,7 +311,7 @@ complete_List_and_MSD <- complete_List_and_MSD %>%
 #When we looked at the results of the 2Mar17 run it looked like sample 2015-18982 may not have been added to the wells (abnormally low output). Fernanda repeated this sample along with the other sample from this PTID, (2015-18562) on 7Mar17. This confirmed that sample 2015-18982 was not added to the well on 2March17 so I am removing the data for this PTID from 2Mar17 here, leaving just the 7Mar17 data:
 
 complete_List_and_MSD <- complete_List_and_MSD%>%
-  filter(!run_date == "2March17" & PTID == "630574")
+  filter(!(run_date == "2March17" & PTID == "630574"))
 
 
 
@@ -332,7 +332,7 @@ write.csv(complete_List_and_MSD, file = "compiled_data_for_Wald_group/compiled_T
 
 #We ran out of SpID 2015-28409 so had to use another aliquot, 2015-28410.  2015-28410 is not in Stacy's list so there are NAs in her data for that SpID.
 
-# When we looked at the results of the 2Mar17 run it looked like sample 2015-18982 may not have been added to the wells (abnormally low output). Fernanda repeated this sample, and the other sample from this PTID, (2015-18562) on 7Mar17. Data from both runs are included in this data set.
+# When we looked at the results of the 2Mar17 run it looked like sample 2015-18982 may not have been added to the wells (abnormally low output). Fernanda repeated this sample, and the other sample from this PTID, (2015-18562) on 7Mar17. I removed the 2Mar17 data.
 
 
 
